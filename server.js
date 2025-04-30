@@ -3,6 +3,7 @@ const cors = require('cors');
 const mongoose = require('mongoose');
 const userRoutes = require('./routes/userRoutes');
 const loanRoutes = require('./routes/loanRoutes');
+require('dotenv').config(); 
 
 const app = express();
 const PORT = process.env.PORT || 5000;
@@ -17,17 +18,22 @@ app.get('/', (req, res) => {
   res.send('Loan Management System API is running');
 });
 
-mongoose.connect('mongodb://localhost:27017/loan-management-system', {
+const MONGODB_URI = process.env.MONGO_URI || 'mongodb://localhost:27017/loan-management-system';
+
+mongoose.connect(MONGODB_URI, {
   useNewUrlParser: true,
   useUnifiedTopology: true,
+  serverSelectionTimeoutMS: 15000, 
 })
 .then(() => {
   console.log('Connected to MongoDB');
   
-  // Start server
-  app.listen(PORT, () => {
-    console.log(`Server running on port ${PORT}`);
-  });
+
+  if (process.env.NODE_ENV !== 'production') {
+    app.listen(PORT, () => {
+      console.log(`Server running on port ${PORT}`);
+    });
+  }
 })
 .catch((error) => {
   console.error('MongoDB connection error:', error);
