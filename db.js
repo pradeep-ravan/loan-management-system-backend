@@ -5,7 +5,6 @@ let isConnected = false;
 let connectionPromise = null;
 
 const connectToDatabase = async () => {
-  // If already connected or connecting, return the existing promise
   if (isConnected) {
     return Promise.resolve();
   }
@@ -18,11 +17,10 @@ const connectToDatabase = async () => {
   const options = {
     useNewUrlParser: true,
     useUnifiedTopology: true,
-    bufferCommands: false, // Disable mongoose buffering
-    // Remove bufferMaxEntries as it's no longer supported
-    connectTimeoutMS: 20000, // Increase connect timeout
-    socketTimeoutMS: 45000, // Increase socket timeout
-    family: 4               // Use IPv4
+    bufferCommands: false, 
+    connectTimeoutMS: 20000, 
+    socketTimeoutMS: 45000, 
+    family: 4               
   };
 
   console.log('Connecting to MongoDB...');

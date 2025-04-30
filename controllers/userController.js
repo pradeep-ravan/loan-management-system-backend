@@ -1,10 +1,8 @@
 const User = require('../models/User');
-const connectToDatabase = require('../db'); // Import the connection function
+const connectToDatabase = require('../db'); 
 
-// Create new user
 exports.createUser = async (req, res) => {
   try {
-    // Connect to database first
     await connectToDatabase();
     
     const { name, dob, pan, aadhar, gstin, udyam } = req.body;
@@ -65,10 +63,8 @@ exports.createUser = async (req, res) => {
   }
 };
 
-// Get user by ID
 exports.getUserById = async (req, res) => {
   try {
-    // Connect to database first
     await connectToDatabase();
     
     const user = await User.findById(req.params.id);
@@ -95,10 +91,8 @@ exports.getUserById = async (req, res) => {
   }
 };
 
-// Get user by PAN
 exports.getUserByPAN = async (req, res) => {
   try {
-    // Connect to database first
     await connectToDatabase();
     
     const pan = req.params.pan || '';
@@ -129,10 +123,8 @@ exports.getUserByPAN = async (req, res) => {
   }
 };
 
-// Get all users
 exports.getAllUsers = async (req, res) => {
   try {
-    // Connect to database first
     await connectToDatabase();
     
     const users = await User.find().sort({ createdAt: -1 });
@@ -153,15 +145,12 @@ exports.getAllUsers = async (req, res) => {
   }
 };
 
-// Update user
 exports.updateUser = async (req, res) => {
   try {
-    // Connect to database first
     await connectToDatabase();
     
     const { name, dob, gstin, udyam } = req.body;
     
-    // Only allow updating non-critical fields
     const updateData = {};
     
     if (name) updateData.name = name;
@@ -209,10 +198,8 @@ exports.updateUser = async (req, res) => {
   }
 };
 
-// Delete user
 exports.deleteUser = async (req, res) => {
   try {
-    // Connect to database first
     await connectToDatabase();
     
     const user = await User.findById(req.params.id);

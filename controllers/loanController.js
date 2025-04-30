@@ -1,11 +1,10 @@
 const Loan = require('../models/Loan');
 const User = require('../models/User');
 const { calculateEmiSchedule } = require('../utils/emiCalculator');
-const connectToDatabase = require('../db'); // Import the database connection function
+const connectToDatabase = require('../db'); 
 
 exports.createLoan = async (req, res) => {
   try {
-    // Connect to database first
     await connectToDatabase();
     
     const { userId, disbursementDate, loanAmount, interestRate, tenure, repaymentDates } = req.body;
@@ -67,7 +66,6 @@ exports.createLoan = async (req, res) => {
 
 exports.getLoanById = async (req, res) => {
   try {
-    // Connect to database first
     await connectToDatabase();
     
     const loan = await Loan.findById(req.params.id).populate('userId', 'name pan');
@@ -96,7 +94,6 @@ exports.getLoanById = async (req, res) => {
 
 exports.getLoansByUserId = async (req, res) => {
   try {
-    // Connect to database first
     await connectToDatabase();
     
     const loans = await Loan.find({
@@ -121,7 +118,6 @@ exports.getLoansByUserId = async (req, res) => {
 
 exports.getLoanLedgerCSV = async (req, res) => {
   try {
-    // Connect to database first
     await connectToDatabase();
     
     const loan = await Loan.findById(req.params.id);
@@ -174,10 +170,8 @@ exports.getLoanLedgerCSV = async (req, res) => {
   }
 };
 
-// Add additional methods for updating loan payments or other functionality
 exports.updateLoanPayment = async (req, res) => {
   try {
-    // Connect to database first
     await connectToDatabase();
     
     const { paymentNumber, paymentDate } = req.body;
@@ -191,7 +185,6 @@ exports.updateLoanPayment = async (req, res) => {
       });
     }
     
-    // Find the payment by payment number
     const paymentIndex = loan.emiSchedule.findIndex(p => p.paymentNumber === paymentNumber);
     
     if (paymentIndex === -1) {
@@ -201,7 +194,6 @@ exports.updateLoanPayment = async (req, res) => {
       });
     }
     
-    // Update the payment status
     loan.emiSchedule[paymentIndex].isPaid = true;
     loan.emiSchedule[paymentIndex].actualPaymentDate = paymentDate ? new Date(paymentDate) : new Date();
     
@@ -222,10 +214,8 @@ exports.updateLoanPayment = async (req, res) => {
   }
 };
 
-// Get all loans
 exports.getAllLoans = async (req, res) => {
   try {
-    // Connect to database first
     await connectToDatabase();
     
     const loans = await Loan.find()
