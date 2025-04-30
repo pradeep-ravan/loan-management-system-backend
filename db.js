@@ -19,7 +19,7 @@ const connectToDatabase = async () => {
     useNewUrlParser: true,
     useUnifiedTopology: true,
     bufferCommands: false, // Disable mongoose buffering
-    bufferMaxEntries: 0,   // Disable buffering in MongoDB driver
+    // Remove bufferMaxEntries as it's no longer supported
     connectTimeoutMS: 20000, // Increase connect timeout
     socketTimeoutMS: 45000, // Increase socket timeout
     family: 4               // Use IPv4
