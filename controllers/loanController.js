@@ -1,9 +1,13 @@
 const Loan = require('../models/Loan');
 const User = require('../models/User');
 const { calculateEmiSchedule } = require('../utils/emiCalculator');
+const connectToDatabase = require('../db'); // Import the database connection function
 
 exports.createLoan = async (req, res) => {
   try {
+    // Connect to database first
+    await connectToDatabase();
+    
     const { userId, disbursementDate, loanAmount, interestRate, tenure, repaymentDates } = req.body;
     
     const user = await User.findById(userId);
@@ -55,13 +59,17 @@ exports.createLoan = async (req, res) => {
     
     res.status(500).json({
       success: false,
-      message: 'Server error'
+      message: 'Server error',
+      error: error.message
     });
   }
 };
 
 exports.getLoanById = async (req, res) => {
   try {
+    // Connect to database first
+    await connectToDatabase();
+    
     const loan = await Loan.findById(req.params.id).populate('userId', 'name pan');
     
     if (!loan) {
@@ -80,13 +88,17 @@ exports.getLoanById = async (req, res) => {
     
     res.status(500).json({
       success: false,
-      message: 'Server error'
+      message: 'Server error',
+      error: error.message
     });
   }
 };
 
 exports.getLoansByUserId = async (req, res) => {
   try {
+    // Connect to database first
+    await connectToDatabase();
+    
     const loans = await Loan.find({
       userId: req.params.userId
     }).populate('userId', 'name pan');
@@ -101,13 +113,17 @@ exports.getLoansByUserId = async (req, res) => {
     
     res.status(500).json({
       success: false,
-      message: 'Server error'
+      message: 'Server error',
+      error: error.message
     });
   }
 };
 
 exports.getLoanLedgerCSV = async (req, res) => {
   try {
+    // Connect to database first
+    await connectToDatabase();
+    
     const loan = await Loan.findById(req.params.id);
     
     if (!loan) {
@@ -152,7 +168,82 @@ exports.getLoanLedgerCSV = async (req, res) => {
     
     res.status(500).json({
       success: false,
-      message: 'Server error'
+      message: 'Server error',
+      error: error.message
+    });
+  }
+};
+
+// Add additional methods for updating loan payments or other functionality
+exports.updateLoanPayment = async (req, res) => {
+  try {
+    // Connect to database first
+    await connectToDatabase();
+    
+    const { paymentNumber, paymentDate } = req.body;
+    
+    const loan = await Loan.findById(req.params.id);
+    
+    if (!loan) {
+      return res.status(404).json({
+        success: false,
+        message: 'Loan not found'
+      });
+    }
+    
+    // Find the payment by payment number
+    const paymentIndex = loan.emiSchedule.findIndex(p => p.paymentNumber === paymentNumber);
+    
+    if (paymentIndex === -1) {
+      return res.status(404).json({
+        success: false,
+        message: 'Payment not found'
+      });
+    }
+    
+    // Update the payment status
+    loan.emiSchedule[paymentIndex].isPaid = true;
+    loan.emiSchedule[paymentIndex].actualPaymentDate = paymentDate ? new Date(paymentDate) : new Date();
+    
+    await loan.save();
+    
+    res.status(200).json({
+      success: true,
+      data: loan
+    });
+  } catch (error) {
+    console.error('Error updating loan payment:', error);
+    
+    res.status(500).json({
+      success: false,
+      message: 'Server error',
+      error: error.message
+    });
+  }
+};
+
+// Get all loans
+exports.getAllLoans = async (req, res) => {
+  try {
+    // Connect to database first
+    await connectToDatabase();
+    
+    const loans = await Loan.find()
+      .populate('userId', 'name pan')
+      .sort({ disbursementDate: -1 });
+    
+    res.status(200).json({
+      success: true,
+      count: loans.length,
+      data: loans
+    });
+  } catch (error) {
+    console.error('Error fetching all loans:', error);
+    
+    res.status(500).json({
+      success: false,
+      message: 'Server error',
+      error: error.message
     });
   }
 };
